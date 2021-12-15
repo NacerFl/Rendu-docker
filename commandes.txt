@@ -1,0 +1,41 @@
+
+
+Docker hub ---> mobius0/docker-rendu-ethnode
+
+
+#Partie Terminal et Dockerfile
+
+#Mise en place des deux network bridgé
+1 - docker network create -d bridge --subnet=172.1.1.0/24 MyBridgedNetwork 
+2 - docker network create -d bridge --subnet=172.2.2.0/24 BCNetwork
+
+#Conteneur Nginx sur MyBridgedNetwork
+
+3- docker run -d  --network MyBridgedNetwork --name mynginx nginx
+
+#Création du volume bdd
+
+4- docker volume create bdd
+
+#Conteneur Mongo() rattacher à un volume bdd sur le network MyBridgedNetwork
+
+5 -sudo docker run -d -it --network MyBridgedNetwork --mount source=bdd,destination=/bdd --name mymongo mongo:4.2.2
+
+
+#ETH
+
+##Création du volume blockchain
+
+6- sudo docker volume create blockchain
+
+
+#conteneurs Node eth attacher à  un volume “blockchain” sur le network BCNetwork
+7- sudo docker build -t projecteth ./docker-goeth-project
+8- sudo docker run -d -it --network BCNetwork --mount source=blockchain,destination=/blockchain --name projecteth projecteth
+
+
+
+
+#Partie docker compose 
+
+9 - docker-compose up -d --build

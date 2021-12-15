@@ -1,0 +1,37 @@
+version: "2.2"
+services:
+  projecteth:
+    build: ./docker-goeth-project/
+    volumes:
+      - blockchain:/blockchain
+    ports:
+      - "8545:8545"
+      - "7545:7545"
+    networks:
+      - BCNetwork
+  nginx:
+    depends_on:
+      mymongo:
+        condition: service_started
+    image: nginx
+    ports:
+      - "81:80"
+      - "444:443"
+    networks:
+      - MyBridgedNetwork
+  mymongo:
+    image: mongo
+    volumes:
+      - bdd:/bdd
+    networks:
+      - MyBridgedNetwork
+
+volumes:
+  bdd:
+  blockchain:
+
+networks:
+  MyBridgedNetwork:
+    driver: bridge
+  BCNetwork:
+    driver: bridge
